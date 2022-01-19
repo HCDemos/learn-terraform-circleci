@@ -6,6 +6,14 @@ terraform {
     }
   }
   required_version = "~> 0.14"
+  backend "remote" {
+    hostname = "app.terraform.io"
+    organization = "HCDemos"
+
+    workspaces {
+      name = "tf-circle-ci-pipeline"
+    }
+  }
 }
 
 provider "aws" {
