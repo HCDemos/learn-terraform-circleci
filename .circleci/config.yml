@@ -1,10 +1,8 @@
-version: 2
+version: 2.1
 
 jobs:
-  plan-apply:
-    working_directory: /tmp/project
-    docker:
-      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+  single-job-lifecycle:
+    executor: terraform/default
     steps:
       - checkout
       - run:
@@ -12,6 +10,38 @@ jobs:
             echo "credentials \"app.terraform.io\" {token =
             \"$TERRAFORM_TOKEN\"}" > $HOME/.terraformrc
           name: Create .terraformrc file locally
+      - terraform/install:
+          arch: amd64
+          os: linux
+          terraform_version: 0.14.2
+      - terraform/fmt:
+          path: .
+      - terraform/validate:
+          path: .
+      - terraform/init:
+          backend: true
+          backend_config_file: backend.hcl
+          path: .
+      - terraform/plan:
+          backend_config_file: backend.hcl
+          path: .
+      - terraform/apply:
+          backend_config_file: backend.hcl
+          path: .
+      - terraform/destroy:
+          path: .
+    working_directory: ~/src
+workflows:
+  single-job-lifecycle:
+    jobs:
+      - single-job-lifecycle
+  plan-apply:
+    working_directory: /tmp/project
+    docker:
+      - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
+    steps:
+      - checkout
+      - run:
           name: terraform init & plan
           command: |
             terraform init -input=false
