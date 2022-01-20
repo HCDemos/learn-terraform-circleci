@@ -31,10 +31,7 @@ jobs:
       - terraform/destroy:
           path: .
     working_directory: ~/src
-workflows:
-  single-job-lifecycle:
-    jobs:
-      - single-job-lifecycle
+
   plan-apply:
     working_directory: /tmp/project
     docker:
@@ -114,3 +111,6 @@ workflows:
       - destroy:
           requires:
             - hold-destroy
+  single-job-lifecycle:
+    jobs:
+      - single-job-lifecycle
